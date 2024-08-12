@@ -33,7 +33,7 @@ android {
 
 configurations.all {
     resolutionStrategy {
-        force 'io.netty:netty-codec-http2:4.1.100.Final'
+        force 'io.netty:netty-codec-http2:4.1.112.Final'
     }
 }
 
