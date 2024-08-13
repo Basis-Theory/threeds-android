@@ -1,4 +1,4 @@
-package com.basistheory.threeds.example.ui.theme
+package com.basistheory.threeds.example.view.styling.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
