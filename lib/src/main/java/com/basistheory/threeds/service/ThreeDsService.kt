@@ -11,7 +11,7 @@ import kotlinx.coroutines.Dispatchers
 interface Service {
     /**
      * - `application: Context` The application context.
-     * - `locale: String?` Provides information about the default Locality
+     * - `locale: String?` Provides information about the default Locality in the format: `{language}-{country}`
      * - `coroutineScope: CoroutineScope?` Scope of the coroutine calling this suspend function
      */
     suspend fun initialize(
@@ -38,7 +38,7 @@ class ThreeDsService  : Service {
             sdk.initialize(
                 applicationContext,
                 configParameters,
-                locale ?: applicationContext.resources.configuration.locale.toString(),
+                locale ?: "${applicationContext.resources.configuration.locale.language}-${applicationContext.resources.configuration.locale.country}",
                 null, // UI customization not supported for V1
                 null, // UI customization not supported for V1
                 scope ?: CoroutineScope(context = Dispatchers.IO)
