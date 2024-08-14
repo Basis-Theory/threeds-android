@@ -4,10 +4,6 @@ on:
   pull_request:
     branches: [ master ]
 
-env:
-  ORG_GRADLE_PROJECT_maven_ravelin_username: ${{ MAVEN_RAVELIN_USERNAME }}
-  ORG_GRADLE_PROJECT_maven_ravelin_password: ${{ secrets.MAVEN_RAVELIN_PASSWORD }}
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -28,6 +24,9 @@ jobs:
 
       - name: Build modules
         run: ./gradlew build -x test
+        env:
+          MAVEN_RAVELIN_USERNAME: ${{ vars.MAVEN_RAVELIN_USERNAME }}
+          MAVEN_RAVELIN_PASSWORD: ${{ secrets.MAVEN_RAVELIN_PASSWORD }}
 
       - name: Run unit tests
         run: ./gradlew testDebugUnitTest

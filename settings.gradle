@@ -18,8 +18,8 @@ dependencyResolutionManagement {
         mavenCentral()
         maven {
             credentials {
-                username = properties["ravelin_username"]
-                password = properties["ravelin_password"]
+                username = properties["maven_ravelin_username"] ?: System.getenv("MAVEN_RAVELIN_USERNAME")
+                password = properties["maven_ravelin_password"] ?: System.getenv("MAVEN_RAVELIN_PASSWORD")
             }
             authentication {
                 basic(BasicAuthentication)
