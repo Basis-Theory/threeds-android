@@ -5,8 +5,8 @@ on:
     branches: [ master ]
 
 env:
-  ORG_GRADLE_PROJECT_com.basistheory.threeds.example.apiUrl: https://api.flock-dev.com
-  ORG_GRADLE_PROJECT_com.basistheory.threeds.example.apiKey: ${{ secrets.BASIS_THEORY_API_KEY }}
+  ORG_GRADLE_PROJECT_maven_ravelin_username: ${{ MAVEN_RAVELIN_USERNAME }}
+  ORG_GRADLE_PROJECT_maven_ravelin_password: ${{ secrets.MAVEN_RAVELIN_PASSWORD }}
 
 jobs:
   build:
