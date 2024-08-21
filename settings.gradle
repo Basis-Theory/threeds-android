@@ -16,6 +16,16 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven {
+            credentials {
+                username = properties["maven_ravelin_username"] ?: System.getenv("MAVEN_RAVELIN_USERNAME")
+                password = properties["maven_ravelin_password"] ?: System.getenv("MAVEN_RAVELIN_PASSWORD")
+            }
+            authentication {
+                basic(BasicAuthentication)
+            }
+            setUrl("https://maven.ravelin.com/repositories/threeds2service/")
+        }
     }
 }
 

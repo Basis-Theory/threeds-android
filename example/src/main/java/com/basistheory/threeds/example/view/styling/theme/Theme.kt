@@ -1,6 +1,5 @@
-package com.basistheory.threeds.example.ui.theme
+package com.basistheory.threeds.example.view.styling.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
