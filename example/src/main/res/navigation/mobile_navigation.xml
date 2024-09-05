@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/nav_card">
+    app:startDestination="@+id/three_ds">
 
     <fragment
-        android:id="@+id/nav_card"
+        android:id="@+id/three_ds"
         android:name="com.basistheory.threeds.example.view.three_ds.ThreeDs"
         android:label="@string/three_ds"
         tools:layout="@layout/fragment_three_ds" />
