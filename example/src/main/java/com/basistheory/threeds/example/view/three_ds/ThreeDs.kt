@@ -1,6 +1,10 @@
 package com.basistheory.threeds.example.view.three_ds
 
 import android.os.Bundle
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -17,23 +21,29 @@ class ThreeDs : Fragment() {
         FragmentThreeDsBinding.inflate(layoutInflater)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
 
-        val threeDsService = ThreeDsService
-            .Builder()
-            .withApiKey("btApiKey")
-            .withApplicationContext(requireContext().applicationContext)
-            .withRegion(Region.EU)
-            .build()
+    private val viewModel: ThreeDsViewModel by viewModels()
 
-        binding.viewModel = ThreeDsViewModel(threeDsService);
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        super.onCreateView(inflater, container, savedInstanceState)
+        binding.lifecycleOwner = this
+
+        binding.viewModel = viewModel
+
+        binding.postButton.setOnClickListener { createSessionHandler() }
+
+        viewModel.initialize().observe(viewLifecycleOwner) {}
+
+        return binding.root
+    }
 
 
-        this.lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
-                binding.viewModel!!.initialize()
-            }
-        }
+    private fun createSessionHandler() {
+        Log.i("3ds_service", "Creating Session")
+        viewModel.createSession("<TOKEN ID>").observe(viewLifecycleOwner) {}
     }
 }
