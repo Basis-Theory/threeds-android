@@ -1,15 +1,17 @@
 package com.basistheory.threeds.example.viewmodel
 
+import android.app.Activity
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
+import com.basistheory.threeds.model.ChallengeResponse
 import com.basistheory.threeds.model.CreateThreeDsSessionResponse
 import com.basistheory.threeds.service.ThreeDsService
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+
 
 open class ThreeDsViewModel(application: Application) : AndroidViewModel(application) {
     private val _errorMessage = MutableLiveData<String?>(null)
@@ -20,15 +22,27 @@ open class ThreeDsViewModel(application: Application) : AndroidViewModel(applica
     val result: LiveData<String?>
         get() = _result
 
+    private val _warnings = MutableLiveData<List<String?>?>(null)
+    val warnings: LiveData<List<String?>?>
+        get() = _warnings
+
+    val tokenId = MutableLiveData<String?>(null)
+
+    val session = MutableLiveData<CreateThreeDsSessionResponse?>(null)
+
+
+    val challengeResponse = MutableLiveData<ChallengeResponse?>(null)
+
     private val json = Json {
         prettyPrint = true
         prettyPrintIndent = "   "
+        ignoreUnknownKeys = true
     }
 
     private val threeDsService = ThreeDsService
         .Builder()
-        .withApiKey("<YOUR API KEY>")
-        .withSandbox()
+        .withApiKey("< API_KEY >")
+        .withAuthenticationEndpoint("< AUTH ENDPOINT >")
         .withApplicationContext(application.applicationContext)
         .build()
 
@@ -37,26 +51,46 @@ open class ThreeDsViewModel(application: Application) : AndroidViewModel(applica
         _result.value = null
 
         try {
-            Log.i("3ds_service", "Initializing 3DS Service")
-
-            threeDsService.initialize()
+            _warnings.value = threeDsService.initialize()
         } catch (e: Exception) {
-            Log.i("3ds_service", "${e.localizedMessage ?: e}")
-
             _errorMessage.value = e.localizedMessage
         }
     }
 
-    fun createSession(tokenId: String): LiveData<Any> = liveData {
+    fun createSession(): LiveData<Any> = liveData {
+        _errorMessage.value = null
+        _result.value = null
+
+        val tokenId = requireNotNull(tokenId.value)
+
+        try {
+            session.value = threeDsService.createSession(tokenId)
+        } catch (e: Exception) {
+            _errorMessage.value = e.localizedMessage
+        }
+    }
+
+    private fun onChallengeCompleted(result: ChallengeResponse) {
+        challengeResponse.postValue(result)
+    }
+
+    private fun onChallengeFailed(result: ChallengeResponse) {
+        _errorMessage.postValue(json.encodeToString(result))
+    }
+
+    fun startChallenge(sessionId: String, activity: Activity): LiveData<Any> = liveData {
         _errorMessage.value = null
         _result.value = null
 
         try {
-            _result.value = threeDsService.createSession(tokenId)?.let {
-                json.encodeToString<CreateThreeDsSessionResponse>(it)
-            }
+            threeDsService.startChallenge(
+                sessionId,
+                activity,
+                ::onChallengeCompleted,
+                ::onChallengeFailed
+            )
         } catch (e: Exception) {
-            _errorMessage.value = e.localizedMessage
+            throw e
         }
     }
 }

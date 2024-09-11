@@ -1,16 +1,25 @@
 package com.basistheory.threeds.service
 
+import android.app.Activity
 import android.content.Context
 import android.util.Log
+import com.basistheory.threeds.model.AuthenticationResponse
+import com.basistheory.threeds.model.ChallengeResponse
 import com.basistheory.threeds.model.CreateThreeDsSessionResponse
 import com.basistheory.threeds.model.RavelinKeys
 import com.basistheory.threeds.model.ThreeDSDeviceInfo
 import com.basistheory.threeds.model.ThreeDSMobileSdkRenderOptions
 import com.basistheory.threeds.model.UpdateThreeDsSessionRequest
 import com.ravelin.core.configparameters.ConfigParametersBuilder
+import com.ravelin.core.transaction.challenge.ChallengeParameters
 import com.ravelin.threeds2service.instantiation.ThreeDS2ServiceInstance
 import com.ul.emvco3ds.sdk.spec.AuthenticationRequestParameters
+import com.ul.emvco3ds.sdk.spec.ChallengeStatusReceiver
+import com.ul.emvco3ds.sdk.spec.CompletionEvent
 import com.ul.emvco3ds.sdk.spec.ConfigParameters
+import com.ul.emvco3ds.sdk.spec.ProtocolErrorEvent
+import com.ul.emvco3ds.sdk.spec.RuntimeErrorEvent
+import com.ul.emvco3ds.sdk.spec.Transaction
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -39,6 +48,7 @@ class ThreeDsServiceBuilder {
     private var locale: String? = null
     private var scope: CoroutineScope = CoroutineScope(context = Dispatchers.IO)
     private var sandbox: Boolean = false
+    private var authenticationEndpoint: String? = null
     private var apiBaseUrl: String = "api.basistheory.com"
 
     fun withApiKey(apiKey: String) = apply {
@@ -49,9 +59,8 @@ class ThreeDsServiceBuilder {
         this.context = value
     }
 
-    fun withCoroutineScope(value: CoroutineScope) = apply {
-        this.scope = value
-
+    fun withAuthenticationEndpoint(authenticationEndpoint: String) = apply {
+        this.authenticationEndpoint = authenticationEndpoint
     }
 
     fun withLocale(_locale: String?) = apply { this.locale = _locale }
@@ -76,18 +85,19 @@ class ThreeDsServiceBuilder {
     }
 
     fun build(): ThreeDsService {
-        requireNotNull(apiKey) { "Missing Api Key" }
-        requireNotNull(context) { "Missing Application Context" }
+        requireNotNull(apiKey)
+        requireNotNull(context)
+        requireNotNull(authenticationEndpoint)
 
-        val localeOrDefault: String = context!!.let  {
-                locale
-                    ?: "${it.resources.configuration.locale.language}-${it.resources.configuration.locale.country}"
-            }
-
+        val localeOrDefault: String = context!!.let {
+            locale
+                ?: "${it.resources.configuration.locale.language}-${it.resources.configuration.locale.country}"
+        }
 
         return ThreeDsService(
             apiKey = apiKey!!,
             context = context!!,
+            authenticationEndpoint = authenticationEndpoint!!,
             region = region,
             scope = scope,
             locale = localeOrDefault,
@@ -95,7 +105,6 @@ class ThreeDsServiceBuilder {
             apiBaseUrl = apiBaseUrl
         )
     }
-
 }
 
 class ThreeDsService(
@@ -105,21 +114,22 @@ class ThreeDsService(
     private val scope: CoroutineScope,
     private val locale: String,
     private val sandbox: Boolean,
-    private val apiBaseUrl: String
+    private val apiBaseUrl: String,
+    private val authenticationEndpoint: String
 ) {
     private val sdk = ThreeDS2ServiceInstance.get()
     private val client = OkHttpClient()
+    private var transaction: Transaction? = null
 
     companion object {
         fun Builder() = ThreeDsServiceBuilder()
     }
 
     suspend fun initialize(): List<String?>? {
+        var warnings: List<String>? = null
+
         withContext(Dispatchers.IO) {
             runCatching {
-
-                Log.i("3ds_service", "Getting Keys from CDN")
-
                 val req = Request.Builder()
                     .url("https://cdn.basistheory.com/keys/3ds.json")
                     .get()
@@ -129,19 +139,16 @@ class ThreeDsService(
                     .execute().use {
                         val responseBody = requireNotNull(it.body?.string())
                         it.body?.close()
-                        if (!it.isSuccessful) {
-                            throw Error("Unable to fetch credentials, downstream service responded ${it.code}")
-                        }
+                        if (!it.isSuccessful) throw Error("Unable to fetch credentials, downstream service responded ${it.code}")
 
-                        responseBody.also { body ->
-                            Log.i("3ds_service", "Successful response from downstream: $body")
-                        }
+                        responseBody
                     }
 
                 val ravelinApiKeys =
                     Json.decodeFromString<RavelinKeys>(keysResponseBody)
 
-                val configParameters: ConfigParameters = ConfigParametersBuilder.Builder()
+                val configParameters: ConfigParameters = ConfigParametersBuilder
+                    .Builder()
                     .setEnvironment(region)
                     .setApiToken("Bearer ${if (sandbox) ravelinApiKeys.test else ravelinApiKeys.live}")
                     .build()
@@ -157,10 +164,8 @@ class ThreeDsService(
                 )
             }
         }.onSuccess {
+            Log.i("3ds_service", "3DS Service initialized correctly, running security checks")
 
-            Log.i("3ds_service", "Service initialized correctly, running security checks")
-
-            // TODO: Decide if we want to surface these to the customer or handle them ourselves
             /**  (Security Warnings)[https://developer.ravelin.com/merchant/libraries-and-sdks/android/3ds-sdk/android/#warnings]
              *  We leverage Ravelin SDKs to perform checks
              * SW01	The device is jailbroken.	HIGH
@@ -169,55 +174,38 @@ class ThreeDsService(
              * SM04	A debugger is attached to the App.	MEDIUM
              * SW05	The OS or the OS version is not supported.	HIGH
              */
-            return sdk.getWarnings()
+            warnings = sdk.getWarnings()
                 ?.filter { it?.getID() in setOf("SW01", "SW02", "SW03", "SW04", "SW05") }
-                ?.mapNotNull { it?.getMessage().toString() }
+                ?.mapNotNull { it?.getMessage().toString().trim() }
 
         }.onFailure {
-            Log.i("3ds_service", "Failed to initialize service ${it.message} | $it")
-            throw Error(it)
+            throw Error("Failed to initialize service: $it")
         }
 
-        return null
+        return warnings
     }
 
     suspend fun createSession(tokenId: String): CreateThreeDsSessionResponse? {
-        var session: CreateThreeDsSessionResponse?  = null
+        var session: CreateThreeDsSessionResponse? = null
 
         withContext(Dispatchers.IO) {
             runCatching {
-
                 val createSessionResponse = create3dsSession(tokenId)
 
-                Log.i(
-                    "3ds_service",
-                    "Creating transaction for ${createSessionResponse.directoryServerId} and ${createSessionResponse.recommendedVersion}"
-                )
-
-                val transaction = sdk.createTransaction(
+                transaction = sdk.createTransaction(
                     createSessionResponse.directoryServerId,
                     createSessionResponse.recommendedVersion
                 )
 
-                val authRequestParams = transaction.getAuthenticationRequestParameters()
-                    ?: throw Exception("Unable to get authentication request parameters").also {
-                        Log.i("3ds_service", it.localizedMessage)
-                    }
+                val authRequestParams = transaction!!.getAuthenticationRequestParameters()
 
-              update3dsSession(createSessionResponse.id, authRequestParams)
-
+                update3dsSession(createSessionResponse.id, requireNotNull(authRequestParams))
             }.onSuccess {
                 session = it
             }.onFailure {
-                Log.i(
-                    "3ds_service",
-                    "Error response from downstream: ${it.localizedMessage}"
-                )
+                throw Error("Error while creating session: $it")
             }
-
-
         }
-
 
         return session
     }
@@ -226,29 +214,23 @@ class ThreeDsService(
         val createSessionBody = JSONObject().apply {
             put("pan", tokenId)
             put("device", "app")
-        }.toString()
+        }.toString().toRequestBody("application/json".toMediaType())
 
-        val createSessionRequest = Request.Builder()
-            .url("https://${apiBaseUrl}/3ds/sessions")
+        val request = Request.Builder()
+            .url("https://$apiBaseUrl/3ds/sessions")
             .addHeader("BT-API-KEY", apiKey)
-            .post(createSessionBody.toRequestBody("application/json".toMediaType()))
+            .post(createSessionBody)
             .build()
 
-        val createSessionResponseBody = client.newCall(createSessionRequest).execute().use {
+        val responseBody = client.newCall(request).execute().use { it ->
             val responseBody = requireNotNull(it.body?.string())
             it.body?.close()
-            if (!it.isSuccessful) {
-                throw Exception("Unable to create session: ${it.code} $responseBody")
-            }
-
-            responseBody.also { body ->
-                Log.i("3ds_service", "Successful response from downstream: $body")
-            }
+            if (!it.isSuccessful) throw Exception("Failed to create session: ${it.code} $responseBody")
+            responseBody
         }
 
-        return Json.decodeFromString<CreateThreeDsSessionResponse>(createSessionResponseBody)
+        return Json.decodeFromString<CreateThreeDsSessionResponse>(responseBody)
     }
-
 
     private fun update3dsSession(
         sessionId: String,
@@ -274,28 +256,138 @@ class ThreeDsService(
                     sdkEncryptionData = authRequestParams.getDeviceData()
                 )
             )
-        )
+        ).toRequestBody("application/json".toMediaType())
 
         val updateSessionRequest = Request.Builder()
             .url("https://${apiBaseUrl}/3ds/sessions/${sessionId}")
             .addHeader("BT-API-KEY", apiKey)
-            .put(updateSessionBody.toRequestBody("application/json".toMediaType()))
+            .put(updateSessionBody)
             .build()
 
         val updateSessionResponseBody = client.newCall(updateSessionRequest).execute().use {
             val responseBody = requireNotNull(it.body?.string())
             it.body?.close()
-            if (!it.isSuccessful) {
-                throw Exception("Unable to update session: ${it.code} $responseBody")
-            }
-            responseBody.also { body ->
-                Log.i("3ds_service", "Successful response from downstream: $body")
-            }
+            if (!it.isSuccessful) throw Exception("Failed to update session: ${it.code} $responseBody")
+            responseBody
         }
 
-        val session = Json.decodeFromString<CreateThreeDsSessionResponse>(updateSessionResponseBody)
+        return Json.decodeFromString<CreateThreeDsSessionResponse>(updateSessionResponseBody)
+    }
 
-        return session
+
+    suspend fun startChallenge(
+        sessionId: String,
+        activity: Activity,
+        onCompleted: (ChallengeResponse) -> Unit,
+        onFailure: (ChallengeResponse) -> Unit
+    ) {
+        requireNotNull(transaction)
+
+        val authenticationResponse = authenticateSession(sessionId)
+
+        if (authenticationResponse.authenticationStatus == "challenge") {
+            val params = ChallengeParameters(
+                threeDSServerTransactionID = sessionId,
+                acsRefNumber = authenticationResponse.acsReferenceNumber,
+                acsSignedContent = authenticationResponse.acsSignedContent,
+                acsTransactionID = authenticationResponse.acsTransactionId,
+                threeDSRequestorAppURL = "https://www.ravelin.com/?transID=${
+                    transaction!!
+                        .authenticationParameters
+                        ?.getSDKTransactionID()
+                }",
+                // customer must also return these in their authenticate response
+                merchantName = authenticationResponse?.merchantName,
+                purchaseCurrency = authenticationResponse?.currency,
+                purchaseAmount = authenticationResponse?.purchaseAmount
+            )
+
+            transaction!!.doChallenge(
+                currentActivity = activity,
+                challengeParameters = params,
+                timeOut = 5,
+                challengeStatusReceiver = object : ChallengeStatusReceiver {
+                    override fun completed(completionEvent: CompletionEvent?) {
+                        closeTransaction()
+                        completionEvent?.getTransactionStatus()
+                            ?.let { onCompleted(ChallengeResponse(sessionId, it)) }
+                    }
+
+                    override fun cancelled() {
+                        closeTransaction()
+                        onFailure(ChallengeResponse(sessionId, "N", "Challenge cancelled"))
+                    }
+
+                    override fun timedout() {
+                        closeTransaction()
+                        onFailure(ChallengeResponse(sessionId, "N", "Challenge timed out"))
+                    }
+
+                    override fun protocolError(protocolErrorEvent: ProtocolErrorEvent?) {
+                        closeTransaction()
+                        onFailure(
+                            ChallengeResponse(
+                                sessionId,
+                                "N",
+                                "ProtocolError ${protocolErrorEvent?.getErrorMessage()}"
+                            )
+                        )
+                    }
+
+                    override fun runtimeError(runtimeErrorEvent: RuntimeErrorEvent?) {
+                        closeTransaction()
+                        onFailure(
+                            ChallengeResponse(
+                                sessionId,
+                                "N",
+                                "RuntimeError ${runtimeErrorEvent?.getErrorMessage()}"
+                            )
+                        )
+                    }
+                })
+        }
+    }
+
+    private fun closeTransaction() = try {
+        transaction?.transactionClosed?.takeIf { closed -> !closed }?.let {
+            synchronized(this) {
+                transaction?.close()
+            }
+        }
+    } catch (ex: Exception) {
+        throw Error("Unable to close transaction | $ex")
+    }
+
+
+    private suspend fun authenticateSession(sessionId: String): AuthenticationResponse {
+
+        var response: String? = null
+
+        withContext(Dispatchers.IO) {
+            runCatching {
+                val payload = JSONObject().apply {
+                    put("sessionId", sessionId)
+                }.toString()
+
+                val req = Request.Builder()
+                    .url(authenticationEndpoint)
+                    .post(payload.toRequestBody("application/json".toMediaType()))
+                    .build()
+
+                client.newCall(req)
+                    .execute().use {
+                        val responseBody = requireNotNull(it.body?.string())
+
+                        it.body?.close()
+                        if (!it.isSuccessful) {
+                            throw Error("Unable to authenticate, downstream service responded ${it.code} for session $sessionId")
+                        }
+
+                        response = responseBody
+                    }
+            }
+        }
+        return Json.decodeFromString<AuthenticationResponse>(requireNotNull(response))
     }
 }
 

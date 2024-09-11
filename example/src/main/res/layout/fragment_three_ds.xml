@@ -31,8 +31,16 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <EditText
+                        android:id="@+id/token_id"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Token ID"
+                        android:inputType="text"
+                        android:text="@={viewModel.tokenId}" />
 
                     <Button
                         android:id="@+id/post_button"
@@ -40,10 +48,18 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="20dp"
                         android:backgroundTint="@color/primary"
-                        android:text="@string/create_three_ds_session"
-                        />
+                        android:text="@string/create_three_ds_session" />
+
+                    <Button
+                        android:id="@+id/start_challenge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:backgroundTint="@color/primary"
+                        android:text="@string/start_challenge" />
 
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
