@@ -22,6 +22,10 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+
+        debug {
+            debuggable true
+        }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
@@ -35,11 +39,12 @@ android {
 configurations.all {
     resolutionStrategy {
         force 'io.netty:netty-codec-http2:4.1.100.Final'
+        force 'com.google.protobuf:protobuf-java:3.25.5'
     }
 }
 
 dependencies {
-    implementation "com.ravelin.threeds2service:threeds2service-sdk:1.4.0"
+    implementation "com.ravelin.threeds2service:threeds2service-sdk:1.4.1"
 
     implementation libs.androidx.core.ktx
     implementation libs.androidx.appcompat

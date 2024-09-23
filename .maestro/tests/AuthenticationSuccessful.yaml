@@ -1,0 +1,52 @@
+appId: com.basistheory.threeds.example
+---
+- launchApp
+- extendedWaitUntil:
+          visible: "3DS"
+          timeout: 60000
+
+# Ravelin SDK initializes correctly
+
+- assertVisible: "The integrity of the SDK has been tampered"
+- assertVisible: "An emulator is being used to run the App"
+
+# Visa
+- tapOn: "Token ID"
+- inputText: "72cb3d3a-a1c0-4d47-99ce-447c028ff212" #  4200000000000002
+- tapOn:
+        text: "Create Session"
+        retryTapIfNoChange: false
+- assertVisible: "3DS Session Created"
+- tapOn:
+        text: "Start Challenge"
+        retryTapIfNoChange: false
+- assertVisible: "Challenge successful"
+- tapOn: "Clear"
+
+# Mastercard
+
+- tapOn: "Token ID"
+- inputText: "e67ef906-c108-429a-be89-0e8e546daa2c" #  5555555555554444
+- tapOn:
+    text: "Create Session"
+    retryTapIfNoChange: false
+- assertVisible: "3DS Session Created"
+- tapOn:
+    text: "Start Challenge"
+    retryTapIfNoChange: false
+- assertVisible: "Challenge successful"
+- tapOn: "Clear"
+
+# Amex
+
+- tapOn: "Token ID"
+- inputText: "1993e831-2f65-4d84-b7c4-895d974c79a7" #  34343434343434
+- tapOn:
+    text: "Create Session"
+    retryTapIfNoChange: false
+- assertVisible: "3DS Session Created"
+- tapOn:
+    text: "Start Challenge"
+    retryTapIfNoChange: false
+- assertVisible: "Challenge successful"
+- tapOn: "Clear"

@@ -30,15 +30,17 @@ class ThreeDs : Fragment() {
 
         binding.postButton.setOnClickListener { createSessionHandler() }
         binding.startChallenge.setOnClickListener { startChallengeHandler() }
+        binding.getChallengeResult.setOnClickListener { getChallengeResult() }
+        binding.clear.setOnClickListener { clear() }
 
         viewModel.initialize().observe(viewLifecycleOwner) {}
 
 
-        viewModel.warnings.observe(viewLifecycleOwner, Observer {
-            it?.map {
+        viewModel.warnings.observe(viewLifecycleOwner, Observer { warnings ->
+            warnings?.map {
                 Toast.makeText(
                     requireContext(),
-                    "$it",
+                    it,
                     Toast.LENGTH_LONG
                 ).show()
             }
@@ -54,24 +56,15 @@ class ThreeDs : Fragment() {
         })
 
         viewModel.challengeResponse.observe(viewLifecycleOwner, Observer {
-            if (it?.status == "Y") {
-                Toast.makeText(
-                    requireContext(),
-                    "3DS Challenge Succeeded",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
 
-            if (it?.status == "N") {
+            it?.let {
                 Toast.makeText(
                     requireContext(),
-                    "3DS Challenge Failed",
+                    "Challenge ${it.status}",
                     Toast.LENGTH_LONG
                 ).show()
             }
         })
-
-
 
         return binding.root
     }
@@ -79,6 +72,15 @@ class ThreeDs : Fragment() {
 
     private fun createSessionHandler() {
         viewModel.createSession().observe(viewLifecycleOwner) {}
+    }
+
+
+    private fun getChallengeResult() {
+        viewModel.getChallengeResult().observe(viewLifecycleOwner) {}
+    }
+
+    private fun clear() {
+        viewModel.clear()
     }
 
 

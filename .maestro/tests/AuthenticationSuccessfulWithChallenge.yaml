@@ -1,0 +1,84 @@
+appId: com.basistheory.threeds.example
+---
+- launchApp
+- extendedWaitUntil:
+    visible: "3DS"
+    timeout: 60000
+
+# Ravelin SDK initializes correctly
+
+- assertVisible: "The integrity of the SDK has been tampered"
+- assertVisible: "An emulator is being used to run the App"
+
+# Card 1
+- tapOn: "Token ID"
+- inputText: "cf10ed54-65de-470c-a5f3-30da34a71f83" #  4200000000000015
+- tapOn:
+    text: "Create Session"
+    retryTapIfNoChange: false
+- assertVisible: "3DS Session Created"
+- tapOn:
+    text: "Start Challenge"
+    retryTapIfNoChange: false
+- extendedWaitUntil:
+      visible: "Purchase authentication"
+      timeout: 10000
+- tapOn:
+      below: "Enter your code below"
+- inputText: "1234"
+- tapOn: "Submit"
+- assertVisible: "Challenge successful"
+- tapOn:
+    text: "Get Challenge Result"
+    retryTapIfNoChange: false
+- assertVisible: "successful"
+- tapOn: "Clear"
+
+# Card 2
+- tapOn: "Token ID"
+- inputText: "c0e18aa1-4dc9-4baa-8aec-4badfa1119ca" #  4200000000000004
+- tapOn:
+    text: "Create Session"
+    retryTapIfNoChange: false
+- assertVisible: "3DS Session Created"
+- tapOn:
+    text: "Start Challenge"
+    retryTapIfNoChange: false
+- extendedWaitUntil:
+      visible: "Purchase authentication"
+      timeout: 10000
+- tapOn:
+      below: "Enter your code below"
+- inputText: "1234"
+- tapOn: "Submit"
+- assertVisible: "Challenge successful"
+- tapOn:
+    text: "Get Challenge Result"
+    retryTapIfNoChange: false
+- assertVisible: "successful"
+- tapOn: "Clear"
+
+  # Card 3
+
+- tapOn: "Token ID"
+- inputText: "3049bd17-f705-4e0a-ae2d-5fabe1497044" #  4917610000000000 Visa
+- tapOn:
+    text: "Create Session"
+    retryTapIfNoChange: false
+- assertVisible: "3DS Session Created"
+- tapOn:
+    text: "Start Challenge"
+    retryTapIfNoChange: false
+- extendedWaitUntil:
+      visible: "Purchase authentication"
+      timeout: 10000
+- tapOn:
+      below: "Enter your code below"
+- inputText: "1234"
+- tapOn: "Submit"
+- assertVisible: "Challenge successful"
+- tapOn:
+    text: "Get Challenge Result"
+    retryTapIfNoChange: false
+- assertVisible: "successful"
+- tapOn: "Clear"

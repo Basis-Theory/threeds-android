@@ -58,12 +58,29 @@
                         android:backgroundTint="@color/primary"
                         android:text="@string/start_challenge" />
 
+                    <Button
+                        android:id="@+id/get_challenge_result"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:backgroundTint="@color/primary"
+                        android:text="@string/get_challenge_result" />
+
+                    <Button
+                        android:id="@+id/clear"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:backgroundTint="@color/primary"
+                        android:text="@string/clear" />
+
                 </LinearLayout>
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
                     <TextView
                         android:id="@+id/error_message"
@@ -75,15 +92,82 @@
                         android:textColor="@color/red"
                         android:visibility="@{ viewModel.errorMessage != null ? View.VISIBLE : View.GONE }" />
 
-                    <TextView
-                        android:id="@+id/result"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_marginTop="20dp"
-                        android:fontFamily="monospace"
-                        android:text="@{ viewModel.result }"
-                        android:visibility="@{ viewModel.result != null ? View.VISIBLE : View.GONE }" />
+                        android:orientation="horizontal"
+                        android:visibility="@{ viewModel.status != null ? View.VISIBLE : View.GONE }">
 
+                        <TextView
+                            android:id="@+id/status_header"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginRight="20dp"
+                            android:fontFamily="monospace"
+                            android:text="Authentication Status"
+                            android:textFontWeight="800"
+                            android:visibility="@{View.VISIBLE}" />
+
+                        <TextView
+                            android:id="@+id/status"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:fontFamily="monospace"
+                            android:text="@{ viewModel.status }" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="20dp"
+                        android:orientation="horizontal"
+                        android:visibility="@{ viewModel.statusReason != null ? View.VISIBLE : View.GONE }">
+
+                        <TextView
+                            android:id="@+id/status_reason_header"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginRight="20dp"
+                            android:fontFamily="monospace"
+                            android:text="Authentication Status Reason"
+                            android:textFontWeight="800"
+                            android:visibility="@{View.VISIBLE}" />
+
+                        <TextView
+                            android:id="@+id/status_reason"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:fontFamily="monospace"
+                            android:text="@{ viewModel.statusReason }" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="20dp"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:visibility="@{ viewModel.result != null ? View.VISIBLE : View.GONE }">
+
+                        <TextView
+                            android:id="@+id/payload_response"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="20dp"
+                            android:fontFamily="monospace"
+                            android:text="Payload Response"
+                            android:textFontWeight="800"
+                            android:visibility="@{View.VISIBLE}" />
+
+                        <TextView
+                            android:id="@+id/result"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="20dp"
+                            android:fontFamily="monospace"
+                            android:text="@{ viewModel.result }" />
+                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
 
