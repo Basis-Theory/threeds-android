@@ -1,0 +1,60 @@
+appId: com.basistheory.threeds.example
+---
+- launchApp
+- extendedWaitUntil:
+    visible: "3DS"
+    timeout: 60000
+
+# Ravelin SDK initializes correctly
+
+- assertVisible: "The integrity of the SDK has been tampered"
+- assertVisible: "An emulator is being used to run the App"
+
+# Card 1
+- tapOn: "Token ID"
+- inputText: "1272ae59-01b1-45eb-9146-a23ed23ae0d5" #  4200000000000007 Visa
+- hideKeyboard
+- tapOn:
+    text: "Create Session"
+    retryTapIfNoChange: false
+- assertVisible: "3DS Session Created"
+- tapOn:
+    text: "Start Challenge"
+    retryTapIfNoChange: false
+- assertVisible: "Challenge rejected"
+- assertVisible: "suspected-fraud"
+- tapOn: "Clear"
+
+# Card 2
+
+- tapOn: "Token ID"
+- inputText: "377a5751-b047-432d-9da6-3fa64f1c9c10" #  6759649826438453 Maestro
+- hideKeyboard
+- tapOn:
+    text: "Create Session"
+    retryTapIfNoChange: false
+- assertVisible: "3DS Session Created"
+- tapOn:
+    text: "Start Challenge"
+    retryTapIfNoChange: false
+- assertVisible: "Challenge rejected"
+- assertVisible: "suspected-fraud"
+- tapOn: "Clear"
+
+
+# Card 3
+
+- tapOn: "Token ID"
+- inputText: "ab40f52c-5932-4fdd-8286-fce46e09bf96" #  5405001111111116 Mastercard
+- hideKeyboard
+- tapOn:
+    text: "Create Session"
+    retryTapIfNoChange: false
+- assertVisible: "3DS Session Created"
+- tapOn:
+    text: "Start Challenge"
+    retryTapIfNoChange: false
+- assertVisible: "Challenge rejected"
+- assertVisible: "suspected-fraud"
+- tapOn: "Clear"
+- stopApp

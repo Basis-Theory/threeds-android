@@ -1,0 +1,65 @@
+appId: com.basistheory.threeds.example
+---
+- launchApp
+- extendedWaitUntil:
+    visible: "3DS"
+    timeout: 60000
+
+# Ravelin SDK initializes correctly
+
+- assertVisible: "The integrity of the SDK has been tampered"
+- assertVisible: "An emulator is being used to run the App"
+
+# Card1
+- tapOn: "Token ID"
+- inputText: "9f17f40f-5a72-420d-96cb-2b9a5cebba4d" # 4200000000000009 Visa
+- tapOn:
+    text: "Create Session"
+    retryTapIfNoChange: false
+- assertVisible: "3DS Session Created"
+- tapOn:
+    text: "Start Challenge"
+    retryTapIfNoChange: false
+- extendedWaitUntil:
+    visible: "Purchase authentication"
+    timeout: 10000
+- tapOn:
+    below: "Enter your code below"
+- inputText: "1234"
+- tapOn: "Submit"
+- hideKeyboard
+- assertVisible: "Challenge failed"
+- tapOn:
+      text: "Get Challenge Result"
+      retryTapIfNoChange: false
+- assertVisible: "failed"
+- assertVisible: "card-authentication-failed"
+- tapOn: "Clear"
+
+# Card 2
+
+- tapOn: "Token ID"
+- inputText: "cebdd87e-4e2f-46ae-9d79-7b394b5d4839" #  36700102000000 Diners
+- tapOn:
+    text: "Create Session"
+    retryTapIfNoChange: false
+- assertVisible: "3DS Session Created"
+- tapOn:
+    text: "Start Challenge"
+    retryTapIfNoChange: false
+- extendedWaitUntil:
+    visible: "Purchase authentication"
+    timeout: 10000
+- tapOn:
+    below: "Enter your code below"
+- inputText: "1234"
+- tapOn: "Submit"
+- hideKeyboard
+- assertVisible: "Challenge failed"
+- tapOn:
+      text: "Get Challenge Result"
+      retryTapIfNoChange: false
+- assertVisible: "failed"
+- assertVisible: "card-authentication-failed"
+- tapOn: "Clear"
+- stopApp

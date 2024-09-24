@@ -1,5 +1,20 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.jetbrains.kotlin.android) apply false
+}
+
+
+task maestroTest {
+    doLast {
+        try {
+                exec {
+                    commandLine "maestro", "test", ".maestro/tests/", "--env=APP_ID=com.basistheory.threeds.example", "--format=junit", "--output=report.xml"
+                }
+        } catch (Exception e) {
+            exec {
+                commandLine "maestro", "test", ".maestro/support/screenshot.yml"
+            }
+            throw e
+        }
+    }
 }

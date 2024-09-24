@@ -1,10 +1,9 @@
-package com.basistheory.threeds.model
+package com.basistheory.threeds.example.model
 
 import kotlinx.serialization.Serializable
 
-
 @Serializable
-data class AuthenticationResponse(
+data class ChallengeResult(
     val panTokenId: String,
 
     val threedsVersion: String,
@@ -27,11 +26,11 @@ data class AuthenticationResponse(
 
     val eci: String = "",
 
-    val purchaseAmount: String,
+    val purchaseAmount: String? = null,
 
-    val merchantName: String,
+    val merchantName: String? = null,
 
-    val currency: String?,
+    val currency: String? = null,
 
     val acsChallengeMandated: String? = null,
 

@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 data class ChallengeResponse(
     val id: String,
     val status: String,
-    val errorMessage: String? = null
+    val details: String? = null
 )

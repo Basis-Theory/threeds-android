@@ -1,0 +1,41 @@
+appId: com.basistheory.threeds.example
+---
+- launchApp
+- extendedWaitUntil:
+    visible: "3DS"
+    timeout: 60000
+
+# Ravelin SDK initializes correctly
+
+- assertVisible: "The integrity of the SDK has been tampered"
+- assertVisible: "An emulator is being used to run the App"
+
+# Card 1
+- tapOn: "Token ID"
+- inputText: "0e2e6f4c-6708-42be-9f0d-c74cdd451a71" #  4200000000000012 Visa
+- hideKeyboard
+- tapOn:
+    text: "Create Session"
+    retryTapIfNoChange: false
+- assertVisible: "3DS Session Created"
+- tapOn:
+    text: "Start Challenge"
+    retryTapIfNoChange: false
+- assertVisible: "Unable to authenticate, 3DS service responded 502"
+- tapOn: "Clear"
+
+# Card 2
+
+- tapOn: "Token ID"
+- inputText: "a24a4c24-f6a2-4246-8066-aea0f672a05d" #  122000000000003 Airplus
+- hideKeyboard
+- tapOn:
+    text: "Create Session"
+    retryTapIfNoChange: false
+- assertVisible: "3DS Session Created"
+- tapOn:
+    text: "Start Challenge"
+    retryTapIfNoChange: false
+- assertVisible: "Unable to authenticate, 3DS service responded 502"
+- tapOn: "Clear"
+- stopApp

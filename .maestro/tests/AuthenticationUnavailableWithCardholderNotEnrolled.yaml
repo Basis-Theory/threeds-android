@@ -1,0 +1,43 @@
+appId: com.basistheory.threeds.example
+---
+- launchApp
+- extendedWaitUntil:
+    visible: "3DS"
+    timeout: 60000
+
+# Ravelin SDK initializes correctly
+
+- assertVisible: "The integrity of the SDK has been tampered"
+- assertVisible: "An emulator is being used to run the App"
+
+# Card 1
+- tapOn: "Token ID"
+- inputText: "3530cd84-07e0-43fe-b46b-564579c3eb64" #  4200000000000006 Visa
+- hideKeyboard
+- tapOn:
+    text: "Create Session"
+    retryTapIfNoChange: false
+- assertVisible: "3DS Session Created"
+- tapOn:
+    text: "Start Challenge"
+    retryTapIfNoChange: false
+- assertVisible: "Challenge unavailable"
+- assertVisible: "cardholder-not-enrolled"
+- tapOn: "Clear"
+
+# Card 2
+
+- tapOn: "Token ID"
+- inputText: "1df7c72b-35b1-4b4e-beb8-8fc56fc48419" #  36148900647913 Diners
+- hideKeyboard
+- tapOn:
+    text: "Create Session"
+    retryTapIfNoChange: false
+- assertVisible: "3DS Session Created"
+- tapOn:
+    text: "Start Challenge"
+    retryTapIfNoChange: false
+- assertVisible: "Challenge unavailable"
+- assertVisible: "cardholder-not-enrolled"
+- tapOn: "Clear"
+- stopApp
