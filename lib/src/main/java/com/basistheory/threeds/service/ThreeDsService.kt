@@ -92,8 +92,6 @@ class ThreeDsServiceBuilder {
                 ?: "${it.resources.configuration.locale.language}-${it.resources.configuration.locale.country}"
         }
 
-        Log.e("3DS_service", "$apiKey-$apiBaseUrl")
-
         return ThreeDsService(
             apiKey = apiKey!!,
             context = context!!,
