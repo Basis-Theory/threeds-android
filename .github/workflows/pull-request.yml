@@ -51,13 +51,13 @@ jobs:
       - name: Run tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 31
+          api-level: 32
           arch: x86_64
           target: default
           cores: 2
           profile: pixel_3a
-          ram-size: 4096M
-          sdcard-path-or-size: 100M
+          ram-size: 6144M
+          sdcard-path-or-size: 1024M
           force-avd-creation: false
           emulator-boot-timeout: 900 # 15min
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
