@@ -65,7 +65,7 @@ android {
 
 configurations.all {
     resolutionStrategy {
-        force 'io.netty:netty-codec-http2:4.1.100.Final'
+        force 'io.netty:netty-codec-http2:4.1.113.Final'
         force 'com.google.protobuf:protobuf-java:3.25.5'
     }
 }
