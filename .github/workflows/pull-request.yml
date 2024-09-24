@@ -51,7 +51,7 @@ jobs:
       - name: Run tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 29
+          api-level: 31
           arch: x86_64
           target: default
           cores: 2
@@ -71,7 +71,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: E2E Report (x86_64, x86_64, default)
+          name: E2E Report (31, x86_64, default)
           path: |
             ${{ github.workspace }}/*.mp4
             ${{ github.workspace }}/*.png
