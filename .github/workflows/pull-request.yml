@@ -6,13 +6,7 @@ on:
 
 jobs:
   integration:
-    timeout-minutes: 90
     runs-on: ubuntu-latest-16-cores
-
-    strategy:
-      matrix:
-        arch: [ x86_64 ]
-        api-level: [ 29 ]
 
     env:
       MAVEN_RAVELIN_USERNAME: ${{ vars.MAVEN_RAVELIN_USERNAME }}
@@ -42,14 +36,6 @@ jobs:
           distribution: 'adopt'
           cache: 'gradle'
 
-      - uses: actions/cache@v4
-        with:
-            path: |
-                ~/.android/avd/*
-                ~/.android/adb*
-                ~/.android/debug.keystore
-            key: avd-${{ matrix.api-level }}-${{ matrix.arch }}
-
       - name: Install Maestro
         run: |
           curl -Ls "https://get.maestro.mobile.dev" | bash
@@ -65,8 +51,8 @@ jobs:
       - name: Run tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: ${{ matrix.api-level }}
-          arch: ${{ matrix.arch }}
+          api-level: 29
+          arch: x86_64
           target: default
           cores: 2
           profile: pixel_3a
@@ -85,7 +71,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: E2E Report (${{ matrix.arch }}, ${{ matrix.api-level }}, ${{ matrix.target }})
+          name: E2E Report (x86_64, x86_64, default)
           path: |
             ${{ github.workspace }}/*.mp4
             ${{ github.workspace }}/*.png

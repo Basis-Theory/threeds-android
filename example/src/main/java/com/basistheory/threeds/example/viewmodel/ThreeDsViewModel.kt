@@ -85,8 +85,6 @@ open class ThreeDsViewModel(application: Application) : AndroidViewModel(applica
     }
 
     fun createSession(): LiveData<Any> = liveData {
-        Log.i("3DS_service", "${BuildConfig.BT_API_KEY_PUB}-${BuildConfig.BUILD_TYPE}")
-
         _errorMessage.value = null
         _result.value = null
 
@@ -135,7 +133,6 @@ open class ThreeDsViewModel(application: Application) : AndroidViewModel(applica
 
         withContext(Dispatchers.IO) {
             runCatching {
-                Log.i("3ds_service", "${session.value}")
                 val sessionId = requireNotNull(session.value).id
 
                 val client = OkHttpClient()
@@ -165,7 +162,6 @@ open class ThreeDsViewModel(application: Application) : AndroidViewModel(applica
         }
 
         val decodedResponse = json.decodeFromString<ChallengeResult>(requireNotNull(response));
-        Log.i("3ds_service", "$decodedResponse");
         status.postValue(decodedResponse.authenticationStatus)
         statusReason.postValue(decodedResponse.authenticationStatusReason)
         _result.postValue(json.encodeToString(decodedResponse))

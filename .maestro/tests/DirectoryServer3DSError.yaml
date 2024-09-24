@@ -13,6 +13,7 @@ appId: com.basistheory.threeds.example
 # Card 1
 - tapOn: "Token ID"
 - inputText: "0e2e6f4c-6708-42be-9f0d-c74cdd451a71" #  4200000000000012 Visa
+- hideKeyboard
 - tapOn:
     text: "Create Session"
     retryTapIfNoChange: false
@@ -27,6 +28,7 @@ appId: com.basistheory.threeds.example
 
 - tapOn: "Token ID"
 - inputText: "a24a4c24-f6a2-4246-8066-aea0f672a05d" #  122000000000003 Airplus
+- hideKeyboard
 - tapOn:
     text: "Create Session"
     retryTapIfNoChange: false

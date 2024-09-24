@@ -1,25 +1,19 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.jetbrains.kotlin.android) apply false
 }
 
-task maestroTest {
-    String maestroFlowsDir = ".maestro/tests"
 
+task maestroTest {
     doLast {
         try {
-            file(maestroFlowsDir).eachFile { flowFile ->
                 exec {
-                    commandLine "maestro", "test", "$maestroFlowsDir/${flowFile.name}", "--env=APP_ID=com.basistheory.threeds.example", "--format=junit", "--output=report.xml"
+                    commandLine "maestro", "test", ".maestro/tests/", "--env=APP_ID=com.basistheory.threeds.example", "--format=junit", "--output=report.xml"
                 }
-            }
         } catch (Exception e) {
-            // Take a screenshot if one of the tests fails
             exec {
                 commandLine "maestro", "test", ".maestro/support/screenshot.yml"
             }
-
             throw e
         }
     }

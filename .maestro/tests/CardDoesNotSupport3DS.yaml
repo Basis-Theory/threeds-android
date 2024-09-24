@@ -13,6 +13,7 @@ appId: com.basistheory.threeds.example
 # Card 1
 - tapOn: "Token ID"
 - inputText: "6230ac75-261f-49dc-aefd-958d503a8b1f" #  4100000000000003
+- hideKeyboard
 - tapOn:
     text: "Create Session"
     retryTapIfNoChange: false

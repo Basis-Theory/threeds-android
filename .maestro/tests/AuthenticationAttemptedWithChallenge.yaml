@@ -13,6 +13,7 @@ appId: com.basistheory.threeds.example
 # Card 1
 - tapOn: "Token ID"
 - inputText: "9c008788-23ac-43c4-a20c-d9eadd3860f4" # 4200000000000008 Visa
+- hideKeyboard
 - tapOn:
     text: "Create Session"
     retryTapIfNoChange: false
@@ -38,6 +39,7 @@ appId: com.basistheory.threeds.example
 
 - tapOn: "Token ID"
 - inputText: "01e82604-ceaf-4f4e-a4ac-09893721a997" #  3528000700000000 JCB
+- hideKeyboard
 - tapOn:
     text: "Create Session"
     retryTapIfNoChange: false

@@ -50,7 +50,6 @@ app.post("/3ds/authenticate", async (req, res) => {
       },
     });
 
-    console.log(payload.sessionId, response.panTokenId)
 
     res.status(200).send({
       ...response,
@@ -60,7 +59,6 @@ app.post("/3ds/authenticate", async (req, res) => {
       currency: "826",
     });
   } catch (e) {
-  console.log(e)
     res.status(e.status).send(e.data);
   }
 });
