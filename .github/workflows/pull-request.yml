@@ -62,9 +62,6 @@ jobs:
           emulator-boot-timeout: 900 # 15min
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          pre-emulator-launch-script: |
-            echo "Running pre emulator launch script. Printing the working directory now:"
-            pwd
           script: make run-e2e
 
       - name: Generate Report
