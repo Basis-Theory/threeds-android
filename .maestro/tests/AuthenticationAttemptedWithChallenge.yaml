@@ -60,3 +60,4 @@ appId: com.basistheory.threeds.example
     retryTapIfNoChange: false
 - assertVisible: "attempted" # transStatusReason is not present in ravelin response
 - tapOn: "Clear"
+- stopApp

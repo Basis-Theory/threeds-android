@@ -30,5 +30,4 @@ appId: com.basistheory.threeds.example
       retryTapIfNoChange: false
 - assertVisible: "Unable to create session, 3DS service responded 500"
 - tapOn: "Clear"
-
-
+- stopApp

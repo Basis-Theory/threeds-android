@@ -38,3 +38,4 @@ appId: com.basistheory.threeds.example
     retryTapIfNoChange: false
 - assertVisible: "Unable to authenticate, 3DS service responded 502"
 - tapOn: "Clear"
+- stopApp

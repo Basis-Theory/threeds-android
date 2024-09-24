@@ -40,3 +40,4 @@ appId: com.basistheory.threeds.example
 - assertVisible: "Challenge unavailable"
 - assertVisible: "cardholder-not-enrolled"
 - tapOn: "Clear"
+- stopApp

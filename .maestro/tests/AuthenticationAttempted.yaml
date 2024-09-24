@@ -38,3 +38,4 @@ appId: com.basistheory.threeds.example
     retryTapIfNoChange: false
 - assertVisible: "Challenge attempted"
 - tapOn: "Clear"
+- stopApp

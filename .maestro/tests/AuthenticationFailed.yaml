@@ -41,3 +41,4 @@ appId: com.basistheory.threeds.example
 - assertVisible: "Challenge failed"
 - assertVisible: "card-authentication-failed"
 - tapOn: "Clear"
+- stopApp

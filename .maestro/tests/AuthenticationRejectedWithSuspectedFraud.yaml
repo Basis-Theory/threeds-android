@@ -57,3 +57,4 @@ appId: com.basistheory.threeds.example
 - assertVisible: "Challenge rejected"
 - assertVisible: "suspected-fraud"
 - tapOn: "Clear"
+- stopApp
