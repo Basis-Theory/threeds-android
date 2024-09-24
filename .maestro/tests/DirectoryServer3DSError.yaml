@@ -20,7 +20,7 @@ appId: com.basistheory.threeds.example
 - tapOn:
     text: "Start Challenge"
     retryTapIfNoChange: false
-- assertVisible: "Unable to authenticate, try again. Downstream service responded 502"
+- assertVisible: "Unable to authenticate, 3DS service responded 502"
 - tapOn: "Clear"
 
 # Card 2
@@ -34,5 +34,5 @@ appId: com.basistheory.threeds.example
 - tapOn:
     text: "Start Challenge"
     retryTapIfNoChange: false
-- assertVisible: "Unable to authenticate, try again. Downstream service responded 502"
+- assertVisible: "Unable to authenticate, 3DS service responded 502"
 - tapOn: "Clear"

@@ -16,5 +16,5 @@ appId: com.basistheory.threeds.example
 - tapOn:
     text: "Create Session"
     retryTapIfNoChange: false
-- assertVisible: "Unable to create session. Downstream service responded 400"
+- assertVisible: "Unable to create session, 3DS service responded 400"
 - tapOn: "Clear"
