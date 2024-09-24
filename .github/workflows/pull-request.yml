@@ -20,7 +20,10 @@ jobs:
 
       - run: npx envinfo
 
-      - uses: gradle/actions/setup-gradle@v3
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          dependency-graph: generate-and-submit
+          dependency-graph-continue-on-failure: false
 
       # https://github.blog/changelog/2023-02-23-hardware-accelerated-android-virtualization-on-actions-windows-and-linux-larger-hosted-runners/
       - name: Enable KVM group perms for hardware acceleration
