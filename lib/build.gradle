@@ -65,6 +65,8 @@ configurations.all {
     resolutionStrategy {
         force 'io.netty:netty-codec-http2:4.1.100.Final'
         force 'com.google.protobuf:protobuf-java:3.25.5'
+        force 'com.nimbusds:nimbus-jose-jwt:9.37.2'
+        force 'net.minidev:json-smart:2.4.9'
     }
 }
 
