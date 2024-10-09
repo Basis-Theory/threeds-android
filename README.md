@@ -20,6 +20,7 @@ dependencyResolutionManagement {
     }
 }
 ```
+
 Add dependencies to your app's `build.gradle`
 ```groovy
 dependencies {
@@ -29,13 +30,11 @@ dependencies {
 }
 ```
 
-
 ## Usage
 
 **⚠️ Code for illustration purposes ⚠️**
 
 ```kotlin
-
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,8 +71,8 @@ fun initializeThreeDsService(context: Context, activity: Activity) {
                     threeDsService.startChallenge(
                         it.id,
                         activity,
-                        ::onCompletion,
-                        ::onCompletion
+                        ::onCompletion, // success handler
+                        ::onCompletion // failure handler
                     )
                 } ?: Log.e("3DS_service", "Failed to create session.")
             }
