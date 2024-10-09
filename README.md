@@ -26,7 +26,7 @@ Add dependencies to your app's `build.gradle`
 dependencies {
    //... other deps
    implementation "com.basistheory:3ds-android:1.0.0-beta.0"
-   implementation ("com.ravelin.threeds2service:threeds2service-sdk:1.4.2")
+   implementation "com.ravelin.threeds2service:threeds2service-sdk:1.4.2"
 }
 ```
 
