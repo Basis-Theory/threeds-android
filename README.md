@@ -86,7 +86,7 @@ fun initializeThreeDsService(context: Context, activity: Activity) {
 private fun onCompletion(result: ChallengeResponse) {
     Log.i(
         "3DS_service",
-        "3DS status: ${result.status}, Message: ${result.message}, Transaction ID: ${result.transactionId}"
+        "3DS status: ${result.status}, Details: ${result.details}, Transaction ID: ${result.id}"
     )
 }
 ```
