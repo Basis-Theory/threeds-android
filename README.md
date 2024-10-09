@@ -51,7 +51,7 @@ class MainActivity : ComponentActivity() {
 fun initializeThreeDsService(context: Context, activity: Activity) {
     val threeDsService = ThreeDsService.Builder()
         .withApiKey("<PUBLIC_API_KEY>")
-        .withAuthenticationEndpoint("Your 3DS authentication endpoint")
+        .withAuthenticationEndpoint("Your 3DS authentication endpoint") // https://developers.basistheory.com/docs/guides/process/authenticate-with-3ds#authenticating-a-session
         .withApplicationContext(context)
         .apply {
             // make sure withSandbox is removed in production environments
