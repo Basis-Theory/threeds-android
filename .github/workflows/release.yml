@@ -8,6 +8,8 @@ jobs:
   tag:
     name: Tag repo
     runs-on: ubuntu-latest
+    env:
+      RELEASE_PAT: ${{ secrets.RELEASE_PAT }}
     steps:
       - name: Start Deploy Message
         uses: Basis-Theory/github-actions/deploy-slack-action@master
@@ -27,6 +29,10 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           default_bump: false
           tag_prefix: ""
+
+      - name: Publish to GH Packages
+        run: |
+         NEW_TAG="${{ steps.tag-version.outputs.new_tag }}" make publish-package
 
       - name: Commit files
         if: ${{ steps.tag-version.outputs.release_type != '' }}

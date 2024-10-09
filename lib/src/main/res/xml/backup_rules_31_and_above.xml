@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules >
+    <cloud-backup disableIfNoEncryptionCapabilities="false">
+        <include domain="sharedpref" path="."/>
+        <include domain="file" path="."/>
+        <exclude domain="sharedpref" path="my_secret_shared_prefs.xml"/>
+        <exclude domain="sharedpref" path="my-3ds-shared-preference.xml" />
+        <exclude domain="file" path="datastore/user_pref.pb"/>
+    </cloud-backup>
+</data-extraction-rules>

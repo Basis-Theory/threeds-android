@@ -2,6 +2,31 @@ plugins {
     id 'com.android.library'
     alias(libs.plugins.jetbrains.kotlin.android)
     id "org.jetbrains.kotlin.plugin.serialization" version "1.9.10"
+    id "maven-publish"
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId "com.basistheory"
+            artifactId "3ds-android"
+            version = project.hasProperty('version') ? project.version : 'default-version'
+            artifact("$buildDir/outputs/aar/lib-release.aar")
+        }
+
+    }
+
+    repositories {
+        maven {
+            name "GithubPackages"
+            url uri("https://maven.pkg.github.com/basis-theory/3ds-android")
+
+            credentials {
+                username = "platform@basistheory.com"
+                password = properties["GITHUB_TOKEN"] ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
 }
 
 android {
@@ -44,15 +69,11 @@ configurations.all {
 }
 
 dependencies {
-    implementation "com.ravelin.threeds2service:threeds2service-sdk:1.4.1"
+    implementation ("com.ravelin.threeds2service:threeds2service-sdk:1.4.2")
 
     implementation libs.androidx.core.ktx
-    implementation libs.androidx.appcompat
-    implementation libs.material
-    implementation 'com.squareup.okhttp3:okhttp:4.11.0'
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
 
-    testImplementation libs.junit
-    androidTestImplementation libs.androidx.junit
-    androidTestImplementation libs.androidx.espresso.core
+    implementation 'com.squareup.okhttp3:okhttp:4.11.0'
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.1")
+
 }

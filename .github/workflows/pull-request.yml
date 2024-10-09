@@ -5,6 +5,29 @@ on:
     branches: [ master ]
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      MAVEN_RAVELIN_USERNAME: ${{ vars.MAVEN_RAVELIN_USERNAME }}
+      MAVEN_RAVELIN_PASSWORD: ${{ secrets.MAVEN_RAVELIN_PASSWORD }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup JDK version
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+          cache: 'gradle'
+
+      - name: Setup Gradle cache
+        uses: gradle/gradle-build-action@v2.4.2
+
+      - name: Build modules
+        run: ./gradlew build -x test
+
   integration:
     runs-on: ubuntu-latest-16-cores
 

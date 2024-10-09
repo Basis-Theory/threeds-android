@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content xmlns:tools="http://schemas.android.com/tools">
+    <include domain="sharedpref" path="." />
+    <include domain="file" path="."/>
+    <exclude domain="sharedpref" path="my_secret_shared_prefs.xml" />
+    <exclude domain="sharedpref" path="my-3ds-shared-preference.xml" />
+    <exclude domain="file" path="datastore/user_prefs.pb"
+        tools:ignore="FullBackupContent" />
+</full-backup-content>

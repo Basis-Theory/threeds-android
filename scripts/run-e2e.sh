@@ -5,9 +5,9 @@ TMP_FILE=_fail_proccess
 # $ANDROID_HOME/platform-tools/adb shell screenrecord /sdcard/video_record.mp4 & echo $! > video_record.pid
 # sleep 3
 APP_ID=com.basistheory.threeds.example
+
 npx envinfo
 adb devices
-./gradlew build -x test
 # sync clock
 adb shell su root date -u @$(date +%s)
 # install apk
