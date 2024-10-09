@@ -1,4 +1,4 @@
-# Basis Theory 3DS Android SDK
+# Basis Theory Android 3DS SDK
 
 ## Installation
 
