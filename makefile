@@ -8,3 +8,6 @@ start-dev-server:
 
 run-e2e:
 	./scripts/run-e2e.sh
+
+publish-package:
+	./scripts/publish-package.sh

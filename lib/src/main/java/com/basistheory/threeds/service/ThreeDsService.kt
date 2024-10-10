@@ -200,7 +200,7 @@ class ThreeDsService(
 
                 update3dsSession(createSessionResponse.id, requireNotNull(authRequestParams))
             }.onSuccess {
-                Log.i("3ds_service", "3DS session ${it.id} authenticated")
+                Log.i("3ds_service", "3DS session ${it.id} created")
                 session = it
             }.onFailure {
                 Log.e("3DS_service", "${it.message}")
