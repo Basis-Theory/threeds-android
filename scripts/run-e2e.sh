@@ -8,6 +8,7 @@ APP_ID=com.basistheory.threeds.example
 
 npx envinfo
 adb devices
+./gradlew build -x test
 # sync clock
 adb shell su root date -u @$(date +%s)
 # install apk
