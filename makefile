@@ -7,7 +7,7 @@ start-dev-server:
 	./scripts/start-dev-server.sh
 
 run-e2e:
-    ./scripts/run-e2e.sh
+	./scripts/run-e2e.sh
 
 publish-package:
 	./scripts/publish-package.sh
