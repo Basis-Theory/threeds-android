@@ -24,13 +24,14 @@ jobs:
 
       - name: Bump version and push tag
         id: tag-version
-        uses: mathieudutour/github-tag-action@v6.0
+        uses: mathieudutour/github-tag-action@v6.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           default_bump: false
           tag_prefix: ""
 
       - name: Publish to GH Packages
+        if: ${{ steps.tag-version.outputs.new_tag != '' }}
         run: |
          NEW_TAG="${{ steps.tag-version.outputs.new_tag }}" make publish-package
 
