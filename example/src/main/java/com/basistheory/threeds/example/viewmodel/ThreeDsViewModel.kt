@@ -43,7 +43,6 @@ open class ThreeDsViewModel(application: Application) : AndroidViewModel(applica
     val status = MutableLiveData<String?>(null)
     val statusReason = MutableLiveData<String?>(null)
 
-
     val challengeResponse = MutableLiveData<ChallengeResponse?>(null)
 
     @OptIn(ExperimentalSerializationApi::class)
@@ -52,7 +51,6 @@ open class ThreeDsViewModel(application: Application) : AndroidViewModel(applica
         prettyPrintIndent = "   "
         ignoreUnknownKeys = true
     }
-
 
     fun clear() {
         _errorMessage.postValue(null)
