@@ -65,7 +65,7 @@ class ThreeDSServiceBuilder {
         this.context = value
     }
 
-    fun withAuthenticationEndpoint(authenticationEndpoint: String, headers: Headers) = apply {
+    fun withAuthenticationEndpoint(authenticationEndpoint: String, headers: Headers? = null) = apply {
         this.authenticationEndpoint = authenticationEndpoint
         this.headers = headers
     }
