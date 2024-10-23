@@ -29,6 +29,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import okhttp3.Headers
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -40,7 +41,7 @@ enum class Region {
     EU
 }
 
-class ThreeDsServiceBuilder {
+class ThreeDSServiceBuilder {
     /** Default to EU, according to Ravelin our account was setup to work in the EU
      * US is reserved for "big holdings" in the US
      */
@@ -54,6 +55,7 @@ class ThreeDsServiceBuilder {
     private var sandbox: Boolean = false
     private var authenticationEndpoint: String? = null
     private var apiBaseUrl: String = "api.basistheory.com"
+    private var headers: Headers? = null
 
     fun withApiKey(apiKey: String) = apply {
         this.apiKey = apiKey
@@ -63,8 +65,9 @@ class ThreeDsServiceBuilder {
         this.context = value
     }
 
-    fun withAuthenticationEndpoint(authenticationEndpoint: String) = apply {
+    fun withAuthenticationEndpoint(authenticationEndpoint: String, headers: Headers? = null) = apply {
         this.authenticationEndpoint = authenticationEndpoint
+        this.headers = headers
     }
 
     fun withLocale(_locale: String?) = apply { this.locale = _locale }
@@ -82,7 +85,7 @@ class ThreeDsServiceBuilder {
         this.apiBaseUrl = apiBaseUrl
     }
 
-    fun build(): ThreeDsService {
+    fun build(): ThreeDSService {
         requireNotNull(apiKey)
         requireNotNull(context)
         requireNotNull(authenticationEndpoint)
@@ -92,10 +95,11 @@ class ThreeDsServiceBuilder {
                 ?: "${it.resources.configuration.locale.language}-${it.resources.configuration.locale.country}"
         }
 
-        return ThreeDsService(
+        return ThreeDSService(
             apiKey = apiKey!!,
             context = context!!,
             authenticationEndpoint = authenticationEndpoint!!,
+            authenticationEndpointHeaders = headers!!,
             region = region,
             scope = scope,
             locale = localeOrDefault,
@@ -105,7 +109,7 @@ class ThreeDsServiceBuilder {
     }
 }
 
-class ThreeDsService(
+class ThreeDSService(
     private val apiKey: String,
     private val context: Context,
     private val region: String,
@@ -113,14 +117,15 @@ class ThreeDsService(
     private val locale: String,
     private val sandbox: Boolean,
     private val apiBaseUrl: String,
-    private val authenticationEndpoint: String
+    private val authenticationEndpoint: String,
+    private val authenticationEndpointHeaders: Headers
 ) {
     private val sdk = ThreeDS2ServiceInstance.get()
     private val client = OkHttpClient()
     private var transaction: Transaction? = null
 
     companion object {
-        fun Builder() = ThreeDsServiceBuilder()
+        fun Builder() = ThreeDSServiceBuilder()
     }
 
     suspend fun initialize(): List<String?>? {
@@ -328,12 +333,12 @@ class ThreeDsService(
 
                         override fun cancelled() {
                             closeTransaction()
-                            onFailure(ChallengeResponse(sessionId, "N", "Challenge cancelled"))
+                            onFailure(ChallengeResponse(sessionId, transactionStatusMap["N"]!!, "Challenge cancelled"))
                         }
 
                         override fun timedout() {
                             closeTransaction()
-                            onFailure(ChallengeResponse(sessionId, "N", "Challenge timed out"))
+                            onFailure(ChallengeResponse(sessionId, transactionStatusMap["N"]!!, "Challenge timed out"))
                         }
 
                         override fun protocolError(protocolErrorEvent: ProtocolErrorEvent?) {
@@ -341,7 +346,7 @@ class ThreeDsService(
                             onFailure(
                                 ChallengeResponse(
                                     sessionId,
-                                    "N",
+                                    transactionStatusMap["N"]!!,
                                     "ProtocolError ${protocolErrorEvent?.getErrorMessage()}"
                                 )
                             )
@@ -352,7 +357,7 @@ class ThreeDsService(
                             onFailure(
                                 ChallengeResponse(
                                     sessionId,
-                                    "N",
+                                    transactionStatusMap["N"]!!,
                                     "RuntimeError ${runtimeErrorEvent?.getErrorMessage()}"
                                 )
                             )
@@ -403,6 +408,7 @@ class ThreeDsService(
                 val req = Request.Builder()
                     .url(authenticationEndpoint)
                     .post(payload.toRequestBody("application/json".toMediaType()))
+                    .headers(authenticationEndpointHeaders)
                     .build()
 
                 client.newCall(req)
