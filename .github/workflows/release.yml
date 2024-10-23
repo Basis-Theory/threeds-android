@@ -9,7 +9,7 @@ jobs:
     name: Tag repo
     runs-on: ubuntu-latest
     env:
-      RELEASE_PAT: ${{ secrets.RELEASE_PAT }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Start Deploy Message
         uses: Basis-Theory/github-actions/deploy-slack-action@master
