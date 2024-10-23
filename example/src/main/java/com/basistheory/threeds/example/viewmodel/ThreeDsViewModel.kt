@@ -11,7 +11,7 @@ import com.basistheory.threeds.example.BuildConfig
 import com.basistheory.threeds.example.model.ChallengeResult
 import com.basistheory.threeds.model.ChallengeResponse
 import com.basistheory.threeds.model.CreateThreeDsSessionResponse
-import com.basistheory.threeds.service.ThreeDsService
+import com.basistheory.threeds.service.ThreeDSService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -62,7 +62,7 @@ open class ThreeDsViewModel(application: Application) : AndroidViewModel(applica
         _warnings.postValue(null)
     }
 
-    private val threeDsService = ThreeDsService
+    private val threeDsService = ThreeDSService
         .Builder()
         .withApiKey(BuildConfig.BT_API_KEY_PUB)
         .withAuthenticationEndpoint("http://10.0.2.2:3333/3ds/authenticate")
