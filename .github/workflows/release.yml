@@ -2,20 +2,22 @@ name: Release
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   tag:
     name: Tag repo
     runs-on: ubuntu-latest
-    env:
-      RELEASE_PAT: ${{ secrets.RELEASE_PAT }}
+    permissions:
+      contents: write
+      packages: write
     steps:
       - name: Start Deploy Message
         uses: Basis-Theory/github-actions/deploy-slack-action@master
         with:
           slack-api-token: ${{ secrets.SLACK_DUCKBOT_API_KEY }}
           channel: ${{ vars.SLACK_DUCKBOT_PRODUCT_DEPLOY_CHANNEL }}
+
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -25,9 +27,9 @@ jobs:
       - name: Setup JDK version
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
-          distribution: 'adopt'
-          cache: 'gradle'
+          java-version: "17"
+          distribution: "adopt"
+          cache: "gradle"
 
       - name: Bump version and push tag
         id: tag-version
@@ -40,7 +42,9 @@ jobs:
       - name: Publish to GH Packages
         if: ${{ steps.tag-version.outputs.new_tag != '' }}
         run: |
-         NEW_TAG="${{ steps.tag-version.outputs.new_tag }}" make publish-package
+          NEW_TAG="${{ steps.tag-version.outputs.new_tag }}" make publish-package
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Commit files
         if: ${{ steps.tag-version.outputs.release_type != '' }}
@@ -62,10 +66,11 @@ jobs:
         with:
           github_token: ${{ secrets.SEMANTIC_RELEASE_PAT }}
           branch: ${{ github.ref }}
+
       - name: Stop Deploy Message
         if: always()
         uses: Basis-Theory/github-actions/deploy-slack-action@master
         with:
           slack-api-token: ${{ secrets.SLACK_DUCKBOT_API_KEY }}
           channel: ${{ vars.SLACK_DUCKBOT_PRODUCT_DEPLOY_CHANNEL }}
-          status: 'done'
+          status: "done"
