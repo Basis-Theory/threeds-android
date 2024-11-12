@@ -189,12 +189,16 @@ class ThreeDSService(
         return warnings
     }
 
-    suspend fun createSession(tokenId: String): CreateThreeDsSessionResponse? {
+    suspend fun createSession(tokenId: String? = null, tokenIntentId: String? = null): CreateThreeDsSessionResponse? {
+        require((tokenId == null) != (tokenIntentId == null)) {
+            "Either tokenId or tokenIntentId must be provided, but not both"
+        }
+
         var session: CreateThreeDsSessionResponse? = null
 
         withContext(Dispatchers.IO) {
             runCatching {
-                val createSessionResponse = create3dsSession(tokenId)
+                val createSessionResponse = create3dsSession(tokenId=tokenId, tokenIntentId=tokenIntentId)
 
                 transaction = sdk.createTransaction(
                     createSessionResponse.directoryServerId,
@@ -216,9 +220,10 @@ class ThreeDSService(
         return session
     }
 
-    private fun create3dsSession(tokenId: String): CreateThreeDsSessionResponse {
+    private fun create3dsSession(tokenId: String? = null, tokenIntentId: String? = null): CreateThreeDsSessionResponse {
         val createSessionBody = JSONObject().apply {
-            put("pan", tokenId)
+            tokenId?.let { put("token_id", tokenId) }
+            tokenIntentId?.let { put("token_intent_id", tokenIntentId)}
             put("device", "app")
         }.toString().toRequestBody("application/json".toMediaType())
 
