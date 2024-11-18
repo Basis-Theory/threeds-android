@@ -14,8 +14,19 @@ adb shell su root date -u @$(date +%s)
 # install apk
 adb install example/build/outputs/apk/debug/example-debug.apk
 
-(echo "===== Run E2E Attempt:  1 ====" && ./gradlew maestroTest) ||
-(echo "===== Run E2E Step Failed ====" && touch "$TMP_FILE")
+
+echo "===== Run E2E Attempt:  1 ===="
+
+if ./gradlew maestroTest; then
+    echo "===== Run E2E Step Succeeded ===="
+else
+    echo "===== Run E2E Step Failed ===="
+    touch "$TMP_FILE"
+    # Save logs before exiting
+    adb logcat -d > emulator_logcat.txt
+    exit 1  # Exit after saving logs
+fi
+
 # Save logs to upload as artifact
 adb logcat -d > emulator_logcat.txt
 # Stop video recording
