@@ -120,6 +120,13 @@ class ThreeDSService(
     private val authenticationEndpoint: String,
     private val authenticationEndpointHeaders: Headers
 ) {
+    /**
+     * Change builder to ignore new keys to allow updates to the API without breaking
+     */
+    private val json = Json {
+        ignoreUnknownKeys = true
+    }
+
     private val sdk = ThreeDS2ServiceInstance.get()
     private val client = OkHttpClient()
     private var transaction: Transaction? = null
@@ -148,7 +155,7 @@ class ThreeDSService(
                     }
 
                 val ravelinApiKeys =
-                    Json.decodeFromString<RavelinKeys>(keysResponseBody)
+                    json.decodeFromString<RavelinKeys>(keysResponseBody)
 
                 val configParameters: ConfigParameters = ConfigParametersBuilder
                     .Builder()
@@ -240,14 +247,14 @@ class ThreeDSService(
             responseBody
         }
 
-        return Json.decodeFromString<CreateThreeDsSessionResponse>(responseBody)
+        return json.decodeFromString<CreateThreeDsSessionResponse>(responseBody)
     }
 
     private fun update3dsSession(
         sessionId: String,
         authRequestParams: AuthenticationRequestParameters
     ): CreateThreeDsSessionResponse {
-        val updateSessionBody = Json.encodeToString(
+        val updateSessionBody = json.encodeToString(
             UpdateThreeDsSessionRequest(
                 deviceInfo = ThreeDSDeviceInfo(
                     sdkEphemeralPublicKey = authRequestParams.getSDKEphemeralPublicKey(),
@@ -282,7 +289,7 @@ class ThreeDSService(
             responseBody
         }
 
-        return Json.decodeFromString<CreateThreeDsSessionResponse>(updateSessionResponseBody)
+        return json.decodeFromString<CreateThreeDsSessionResponse>(updateSessionResponseBody)
     }
 
 
@@ -432,7 +439,7 @@ class ThreeDSService(
                 throw ThreeDSAuthenticationError("${it.message}")
             }
         }
-        return Json.decodeFromString<AuthenticationResponse>(requireNotNull(response))
+        return json.decodeFromString<AuthenticationResponse>(requireNotNull(response))
     }
 }
 
