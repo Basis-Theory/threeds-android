@@ -1,5 +1,5 @@
 #!/bin/bash
-set -x
+set -e -x
 TMP_FILE=_fail_proccess
 # Start video recording
 # $ANDROID_HOME/platform-tools/adb shell screenrecord /sdcard/video_record.mp4 & echo $! > video_record.pid
