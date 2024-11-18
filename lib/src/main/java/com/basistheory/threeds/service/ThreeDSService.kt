@@ -99,7 +99,7 @@ class ThreeDSServiceBuilder {
             apiKey = apiKey!!,
             context = context!!,
             authenticationEndpoint = authenticationEndpoint!!,
-            authenticationEndpointHeaders = headers!!,
+            authenticationEndpointHeaders = headers ?: Headers.Builder().build(),
             region = region,
             scope = scope,
             locale = localeOrDefault,
