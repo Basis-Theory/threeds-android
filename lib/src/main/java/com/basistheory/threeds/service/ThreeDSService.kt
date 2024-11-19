@@ -99,7 +99,7 @@ class ThreeDSServiceBuilder {
             apiKey = apiKey!!,
             context = context!!,
             authenticationEndpoint = authenticationEndpoint!!,
-            authenticationEndpointHeaders = headers!!,
+            authenticationEndpointHeaders = headers ?: Headers.Builder().build(),
             region = region,
             scope = scope,
             locale = localeOrDefault,
@@ -120,6 +120,13 @@ class ThreeDSService(
     private val authenticationEndpoint: String,
     private val authenticationEndpointHeaders: Headers
 ) {
+    /**
+     * Change builder to ignore new keys to allow updates to the API without breaking
+     */
+    private val json = Json {
+        ignoreUnknownKeys = true
+    }
+
     private val sdk = ThreeDS2ServiceInstance.get()
     private val client = OkHttpClient()
     private var transaction: Transaction? = null
@@ -148,7 +155,7 @@ class ThreeDSService(
                     }
 
                 val ravelinApiKeys =
-                    Json.decodeFromString<RavelinKeys>(keysResponseBody)
+                    json.decodeFromString<RavelinKeys>(keysResponseBody)
 
                 val configParameters: ConfigParameters = ConfigParametersBuilder
                     .Builder()
@@ -189,12 +196,16 @@ class ThreeDSService(
         return warnings
     }
 
-    suspend fun createSession(tokenId: String): CreateThreeDsSessionResponse? {
+    suspend fun createSession(tokenId: String? = null, tokenIntentId: String? = null): CreateThreeDsSessionResponse? {
+        require((tokenId == null) != (tokenIntentId == null)) {
+            "Either tokenId or tokenIntentId must be provided, but not both"
+        }
+
         var session: CreateThreeDsSessionResponse? = null
 
         withContext(Dispatchers.IO) {
             runCatching {
-                val createSessionResponse = create3dsSession(tokenId)
+                val createSessionResponse = create3dsSession(tokenId=tokenId, tokenIntentId=tokenIntentId)
 
                 transaction = sdk.createTransaction(
                     createSessionResponse.directoryServerId,
@@ -216,9 +227,10 @@ class ThreeDSService(
         return session
     }
 
-    private fun create3dsSession(tokenId: String): CreateThreeDsSessionResponse {
+    private fun create3dsSession(tokenId: String? = null, tokenIntentId: String? = null): CreateThreeDsSessionResponse {
         val createSessionBody = JSONObject().apply {
-            put("pan", tokenId)
+            tokenId?.let { put("token_id", tokenId) }
+            tokenIntentId?.let { put("token_intent_id", tokenIntentId)}
             put("device", "app")
         }.toString().toRequestBody("application/json".toMediaType())
 
@@ -235,14 +247,14 @@ class ThreeDSService(
             responseBody
         }
 
-        return Json.decodeFromString<CreateThreeDsSessionResponse>(responseBody)
+        return json.decodeFromString<CreateThreeDsSessionResponse>(responseBody)
     }
 
     private fun update3dsSession(
         sessionId: String,
         authRequestParams: AuthenticationRequestParameters
     ): CreateThreeDsSessionResponse {
-        val updateSessionBody = Json.encodeToString(
+        val updateSessionBody = json.encodeToString(
             UpdateThreeDsSessionRequest(
                 deviceInfo = ThreeDSDeviceInfo(
                     sdkEphemeralPublicKey = authRequestParams.getSDKEphemeralPublicKey(),
@@ -277,7 +289,7 @@ class ThreeDSService(
             responseBody
         }
 
-        return Json.decodeFromString<CreateThreeDsSessionResponse>(updateSessionResponseBody)
+        return json.decodeFromString<CreateThreeDsSessionResponse>(updateSessionResponseBody)
     }
 
 
@@ -427,7 +439,7 @@ class ThreeDSService(
                 throw ThreeDSAuthenticationError("${it.message}")
             }
         }
-        return Json.decodeFromString<AuthenticationResponse>(requireNotNull(response))
+        return json.decodeFromString<AuthenticationResponse>(requireNotNull(response))
     }
 }
 
