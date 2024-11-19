@@ -1,3 +1,11 @@
+### [0.3.1](https://github.com/Basis-Theory/threeds-android/compare/0.3.0...0.3.1) (2024-11-19)
+
+
+### Bug Fixes
+
+* update repo name ([#45](https://github.com/Basis-Theory/threeds-android/issues/45)) ([cbc29d3](https://github.com/Basis-Theory/threeds-android/commit/cbc29d33af1194897e08e1dc6dc8f8c526c3127c))
+
+
 ## [0.2.0](https://github.com/Basis-Theory/3ds-android/compare/v0.1.0...0.2.0) (2024-10-24)
 
 
