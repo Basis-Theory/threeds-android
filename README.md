@@ -1,5 +1,13 @@
 # Basis Theory Android 3DS SDK
 
+> [!CAUTION]
+> This SDK has been deprecated.
+>
+> Our new SDK can be found at https://github.com/Basis-Theory/android-threeds
+>
+> See our documentation site for more information. https://developers.basistheory.com/docs/sdks/mobile/3ds/?platform=android
+
+
 ## Installation
 
 Add the following to `dependencyResolutionManagement` in `settings.gradle`
